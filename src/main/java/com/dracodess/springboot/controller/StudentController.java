@@ -1,11 +1,14 @@
 package com.dracodess.springboot.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,7 +50,7 @@ public class StudentController {
 	}
 	
 	//Update student
-	@PutMapping("employees/{id}")
+	@PutMapping("students/{id}")
 	public ResponseEntity<Student> updateStudent(@PathVariable(value ="id") Long studentId,
 			@Valid @RequestBody Student studentDetails) throws ResourceNotFoundException {
 		
@@ -65,4 +68,20 @@ public class StudentController {
 		return ResponseEntity.ok(this.studentRepository.save(student));
 	}
 	//Delete student
+	@DeleteMapping("students/{id}")
+	public Map<String, Boolean> deleteStudent(@PathVariable(value = "id") Long studentId) throws ResourceNotFoundException {
+	
+		//Reusing this logic from getStudentById method to GET the student object from the Student database
+		Student student = studentRepository.findById(studentId)
+				.orElseThrow(() -> new ResourceNotFoundException("Student not found using this id: " + studentId));
+		
+		// DELETE student object by ID
+		this.studentRepository.delete(student);
+			
+		//Instantiate a HashMap and return a Boolean
+		Map<String, Boolean> response = new HashMap<>();
+		response.put("deleted",  Boolean.TRUE);
+		
+		return response;
+	}
 }
